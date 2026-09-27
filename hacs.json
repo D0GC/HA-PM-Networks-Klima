@@ -1,0 +1,6 @@
+{
+  "name": "PM Klima",
+  "homeassistant": "2026.2.0",
+  "render_readme": true,
+  "content_in_root": false
+}

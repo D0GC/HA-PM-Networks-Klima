@@ -1,0 +1,26 @@
+name: Erfahrung mit einem Thermostat
+description: Berichten, wie ein Thermostat mit PM Klima funktioniert.
+labels: [geraet]
+body:
+  - type: input
+    id: geraet
+    attributes:
+      label: Gerät und Integration
+    validations:
+      required: true
+  - type: textarea
+    id: attribute
+    attributes:
+      label: hvac_modes und weitere Attribute der climate-Entität
+      render: yaml
+  - type: dropdown
+    id: ergebnis
+    attributes:
+      label: Ergebnis
+      options: [funktioniert, funktioniert mit Einschränkungen, funktioniert nicht]
+    validations:
+      required: true
+  - type: textarea
+    id: hinweise
+    attributes:
+      label: Hinweise

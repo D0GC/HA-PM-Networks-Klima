@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Dokumentation
+    url: https://github.com/D0GC/HA-PM-Networks-Klima#dokumentation
+    about: Installation, Einrichtung, Funktionsweise und FAQ.

@@ -1,0 +1,93 @@
+boost:
+  target:
+    entity:
+      integration: pm_heizung
+      domain: climate
+  fields:
+    dauer:
+      required: false
+      example: 30
+      selector:
+        number:
+          min: 5
+          max: 240
+          step: 5
+          unit_of_measurement: min
+
+set_overlay:
+  target:
+    entity:
+      integration: pm_heizung
+      domain: climate
+  fields:
+    temperatur:
+      required: true
+      example: 21.5
+      selector:
+        number:
+          min: 5
+          max: 30
+          step: 0.5
+          unit_of_measurement: "°C"
+    dauer:
+      required: false
+      example: 60
+      selector:
+        number:
+          min: 0
+          max: 1440
+          step: 5
+          unit_of_measurement: min
+
+clear_overlay:
+  target:
+    entity:
+      integration: pm_heizung
+      domain: climate
+
+reevaluate:
+
+abhaengigkeiten:
+
+entitaet_ersetzen:
+  fields:
+    alt:
+      required: true
+      example: climate.wohnzimmer
+      selector:
+        text:
+    neu:
+      required: true
+      example: climate.wohnzimmer_homekit
+      selector:
+        entity:
+
+beratung_testen:
+  fields:
+    kanal:
+      required: true
+      example: push
+      selector:
+        select:
+          translation_key: kanal
+          options:
+            - push
+            - alexa
+            - panel
+    thema:
+      required: false
+      example: lueften_feuchte
+      selector:
+        select:
+          translation_key: thema
+          options:
+            - frostgefahr
+            - heizen_fenster
+            - schimmel
+            - fenster_schliessen
+            - fenster_regen
+            - lueften_co2
+            - lueften_feuchte
+            - feinstaub
+            - zu_trocken
+            - filter

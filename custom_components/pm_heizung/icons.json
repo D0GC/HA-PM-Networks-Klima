@@ -1,0 +1,93 @@
+{
+  "entity": {
+    "sensor": {
+      "grund": {
+        "default": "mdi:thermostat-auto",
+        "state": {
+          "zeitplan": "mdi:calendar-clock",
+          "abwesenheit": "mdi:home-export-outline",
+          "vorheizen": "mdi:home-import-outline",
+          "fenster": "mdi:window-open-variant",
+          "sperre": "mdi:lock-outline",
+          "manuell": "mdi:hand-back-right",
+          "boost": "mdi:rocket-launch",
+          "aus": "mdi:radiator-off",
+          "pausiert": "mdi:pause-circle-outline",
+          "fenster_extern": "mdi:window-open"
+        }
+      },
+      "abwesenheitsphase": {
+        "default": "mdi:map-marker-distance",
+        "state": {
+          "zuhause": "mdi:home",
+          "komfort": "mdi:home-import-outline",
+          "zwischen": "mdi:map-marker-radius",
+          "halten": "mdi:home-export-outline",
+          "fern": "mdi:airplane"
+        }
+      },
+      "luftqualitaet": {
+        "default": "mdi:air-filter",
+        "state": {
+          "gut": "mdi:leaf",
+          "mittel": "mdi:weather-windy",
+          "schlecht": "mdi:alert-circle-outline"
+        }
+      },
+      "schimmelrisiko": {
+        "default": "mdi:water-percent-alert"
+      },
+      "lueftdauer": {
+        "default": "mdi:timer-sand"
+      },
+      "klima_empfehlung": {
+        "default": "mdi:message-text-outline"
+      }
+    },
+    "switch": {
+      "aktiv": {
+        "default": "mdi:radiator",
+        "state": {
+          "off": "mdi:radiator-disabled"
+        }
+      },
+      "beratung": {
+        "default": "mdi:message-badge-outline",
+        "state": {
+          "off": "mdi:message-off-outline"
+        }
+      },
+      "luftreiniger_automatik": {
+        "default": "mdi:air-purifier",
+        "state": {
+          "off": "mdi:air-purifier-off"
+        }
+      }
+    },
+    "binary_sensor": {
+      "lueften_empfohlen": {
+        "default": "mdi:window-closed-variant",
+        "state": {
+          "on": "mdi:window-open-variant"
+        }
+      }
+    }
+  },
+  "services": {
+    "boost": {
+      "service": "mdi:rocket-launch"
+    },
+    "set_overlay": {
+      "service": "mdi:hand-back-right"
+    },
+    "clear_overlay": {
+      "service": "mdi:calendar-refresh"
+    },
+    "reevaluate": {
+      "service": "mdi:refresh"
+    },
+    "beratung_testen": {
+      "service": "mdi:message-question-outline"
+    }
+  }
+}

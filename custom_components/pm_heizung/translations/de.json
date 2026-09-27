@@ -1,0 +1,542 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Personen & Proximity",
+        "data": {
+          "personen": "Personen",
+          "anwesenheit_entitaeten": "Anwesenheits-Entitäten (optional)",
+          "abstand_sensoren": "Proximity – Abstandssensoren",
+          "richtung_sensoren": "Proximity – Richtungssensoren",
+          "sprache": "Sprache der Texte"
+        },
+        "description": "Wer wird für Abwesenheit und Vorheizen ausgewertet?",
+        "data_description": {
+          "anwesenheit_entitaeten": "Wenn gesetzt, gilt „jemand zuhause“ = mindestens eine Entität ist „an“ (empfohlen bei entprellten Helfern). Sonst zählt der Personen-Zustand „home“.",
+          "abstand_sensoren": "Je Person der Abstandssensor der Proximity-Integration (Einheit wird automatisch umgerechnet). Ohne Sensoren wird bei Abwesenheit nur abgesenkt (Phase halten).",
+          "richtung_sensoren": "In derselben Reihenfolge wie die Abstandssensoren wählen (paarweise Auswertung). Bei ungleicher Anzahl wird aggregiert.",
+          "sprache": "Gilt für Anzeigetexte, Empfehlungen und Meldungen der Beratung. Automatisch = Sprache von Home Assistant (Deutsch bei de, sonst Englisch)."
+        }
+      },
+      "abwesenheit": {
+        "title": "Abwesenheit & Vorheizen",
+        "data": {
+          "absenkung": "Absenkung bei Abwesenheit",
+          "mindesttemperatur": "Mindesttemperatur bei Abwesenheit",
+          "fern_absenkung": "Zusätzliche Fern-Absenkung",
+          "vorheizstufe": "Vorheizstufe",
+          "eigener_nahradius": "Eigener Nahradius",
+          "eigener_mittelradius": "Eigener Mittelradius",
+          "eigener_fernradius": "Eigener Fernradius",
+          "annaeherung_erforderlich": "Annäherung erforderlich",
+          "verlassen_verzoegerung": "Verlassen-Verzögerung"
+        },
+        "description": "Geofencing: Absenkung bei Abwesenheit, Vorheizen bei Annäherung.",
+        "data_description": {
+          "absenkung": "Haltetemperatur = Komforttemperatur des Raums − Absenkung (nie über der aktuellen Zeitplantemperatur).",
+          "fern_absenkung": "Zusätzlich, wenn alle außerhalb des Fernradius sind. 0 = aus.",
+          "vorheizstufe": "Nah/Mittel/Fern: Eco 1,5/4/15 km · Balance 4/10/25 km · Komfort 10/25/50 km · Aus: kein Vorheizen (Fern 25 km).",
+          "annaeherung_erforderlich": "Vorheizen nur bei Richtung „towards“. Eine erreichte Stufe bleibt, solange niemand „away_from“ meldet und die Person im Radius bleibt.",
+          "verlassen_verzoegerung": "So lange muss niemand zuhause sein, bevor abgesenkt wird."
+        }
+      },
+      "sperre": {
+        "title": "Sperre (Außentemperatur / Freigabe)",
+        "data": {
+          "aussentemperatur_sensor": "Außentemperatur-Sensor (optional)",
+          "aussentemperatur_grenze": "Außentemperatur-Grenze",
+          "freigabe_entitaet": "Freigabe / Sommerschalter (optional)",
+          "sperre_wirkung": "Wirkung der Sperre",
+          "sperre_mindesthaltezeit": "Mindesthaltezeit der Sperre"
+        },
+        "description": "Die Rückkehr bei Ankunft läuft immer, auch während der Sperre.",
+        "data_description": {
+          "aussentemperatur_sensor": "Ab der Grenze (keine Hysterese) wird gesperrt. Ein unbekannter Wert sperrt nicht.",
+          "freigabe_entitaet": "Nur wenn diese Entität „an“ ist, darf die Abwesenheitslogik arbeiten. Leer = immer.",
+          "sperre_wirkung": "Zeitplan: Abwesenheit/Vorheizen pausieren, Räume folgen ihrem Zeitplan (Blueprint-Verhalten). Heizung aus: Räume im Auto-Modus werden abgeschaltet (Sommerbetrieb).",
+          "sperre_mindesthaltezeit": "Ein Wechsel gesperrt ↔ frei durch die Außentemperatur wird erst übernommen, wenn der bisherige Zustand so lange bestand (verhindert ständiges Umschalten um die Grenze). Die Grenze selbst bleibt exakt. Die Freigabe-Entität wirkt sofort."
+        }
+      },
+      "luft": {
+        "title": "Luft: Außenwerte",
+        "data": {
+          "luft_aussentemperatur": "Außentemperatur für Luft (optional)",
+          "luft_aussenfeuchte": "Außenluftfeuchte (optional)",
+          "wetter_entitaet": "Wetter-Entität für Regen (optional)"
+        },
+        "description": "Für absolute Feuchte, Schimmelrisiko und Lüftempfehlungen. Alles optional.",
+        "data_description": {
+          "luft_aussentemperatur": "Leer = Sensor der Sperre (Schritt 3).",
+          "luft_aussenfeuchte": "Für absolute Feuchte außen („Lüften sinnvoll“).",
+          "wetter_entitaet": "Regen, Gewitter, Hagel und Schneeregen verhindern die Feuchte-Lüftempfehlung und lösen „Fenster offen bei Regen“ aus."
+        }
+      },
+      "beratung": {
+        "title": "Beratung: Benachrichtigungen",
+        "data": {
+          "beratung_push": "Push an anwesende Personen",
+          "beratung_alexa": "Sprachansage (z. B. Alexa)",
+          "beratung_panel": "Wanddisplay (z. B. NSPanel)",
+          "beratung_push_zuordnung": "Zuordnung Person → Push-Dienst",
+          "beratung_alexa_skript": "Skript für Sprachansagen",
+          "beratung_panel_dienst": "Dienst für das Wanddisplay",
+          "beratung_stumm": "Stummschalter (sperren Sprachansagen)",
+          "beratung_ruhe_beginn": "Ruhezeit ab",
+          "beratung_ruhe_ende": "Ruhezeit bis",
+          "beratung_abstand": "Mindestabstand je Thema und Raum"
+        },
+        "description": "Eingeschaltet wird die Beratung über den Schalter „PM Klima Beratung“ (Standard aus).",
+        "data_description": {
+          "beratung_push_zuordnung": "Eine Zeile je Person, z. B. „person.anna: notify.mobile_app_annas_iphone“. Push geht nur an anwesende Personen (bei Abwesenheit aller nur Frost/Fenster an alle). Leer = kein Push.",
+          "beratung_alexa_skript": "Skript für Sprachansagen, aufgerufen mit message, type=tts und title (z. B. ein Skript um notify.alexa_media). Leer = keine Ansage. Zusätzlich gelten die Stummschalter.",
+          "beratung_panel_dienst": "Dienst mit den Feldern label und message, z. B. eine ESPHome-Aktion für ein Wanddisplay (esphome.GERÄT_notification_show). Leer = keine Anzeige.",
+          "beratung_stumm": "Ist einer davon an, gibt es keine Sprachansage (Beratung ist keine Sicherheitsmeldung).",
+          "beratung_ruhe_beginn": "In der Ruhezeit kein Push und keine Sprachansage – außer Frostgefahr. Das Wanddisplay zeigt weiter an.",
+          "beratung_abstand": "Dieselbe Meldung für denselben Raum frühestens nach dieser Zeit erneut. Zwischen zwei beliebigen Meldungen liegen mindestens 10 Minuten."
+        }
+      }
+    },
+    "error": {
+      "richtung_ohne_abstand": "Richtungssensoren benötigen Abstandssensoren."
+    },
+    "abort": {
+      "already_configured": "PM Klima ist bereits eingerichtet. Räume werden über „Raum hinzufügen“ angelegt."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "title": "Personen & Proximity",
+        "data": {
+          "personen": "Personen",
+          "anwesenheit_entitaeten": "Anwesenheits-Entitäten (optional)",
+          "abstand_sensoren": "Proximity – Abstandssensoren",
+          "richtung_sensoren": "Proximity – Richtungssensoren",
+          "sprache": "Sprache der Texte"
+        },
+        "description": "Wer wird für Abwesenheit und Vorheizen ausgewertet?",
+        "data_description": {
+          "anwesenheit_entitaeten": "Wenn gesetzt, gilt „jemand zuhause“ = mindestens eine Entität ist „an“ (empfohlen bei entprellten Helfern). Sonst zählt der Personen-Zustand „home“.",
+          "abstand_sensoren": "Je Person der Abstandssensor der Proximity-Integration (Einheit wird automatisch umgerechnet). Ohne Sensoren wird bei Abwesenheit nur abgesenkt (Phase halten).",
+          "richtung_sensoren": "In derselben Reihenfolge wie die Abstandssensoren wählen (paarweise Auswertung). Bei ungleicher Anzahl wird aggregiert.",
+          "sprache": "Gilt für Anzeigetexte, Empfehlungen und Meldungen der Beratung. Automatisch = Sprache von Home Assistant (Deutsch bei de, sonst Englisch)."
+        }
+      },
+      "abwesenheit": {
+        "title": "Abwesenheit & Vorheizen",
+        "data": {
+          "absenkung": "Absenkung bei Abwesenheit",
+          "mindesttemperatur": "Mindesttemperatur bei Abwesenheit",
+          "fern_absenkung": "Zusätzliche Fern-Absenkung",
+          "vorheizstufe": "Vorheizstufe",
+          "eigener_nahradius": "Eigener Nahradius",
+          "eigener_mittelradius": "Eigener Mittelradius",
+          "eigener_fernradius": "Eigener Fernradius",
+          "annaeherung_erforderlich": "Annäherung erforderlich",
+          "verlassen_verzoegerung": "Verlassen-Verzögerung"
+        },
+        "description": "Geofencing: Absenkung bei Abwesenheit, Vorheizen bei Annäherung.",
+        "data_description": {
+          "absenkung": "Haltetemperatur = Komforttemperatur des Raums − Absenkung (nie über der aktuellen Zeitplantemperatur).",
+          "fern_absenkung": "Zusätzlich, wenn alle außerhalb des Fernradius sind. 0 = aus.",
+          "vorheizstufe": "Nah/Mittel/Fern: Eco 1,5/4/15 km · Balance 4/10/25 km · Komfort 10/25/50 km · Aus: kein Vorheizen (Fern 25 km).",
+          "annaeherung_erforderlich": "Vorheizen nur bei Richtung „towards“. Eine erreichte Stufe bleibt, solange niemand „away_from“ meldet und die Person im Radius bleibt.",
+          "verlassen_verzoegerung": "So lange muss niemand zuhause sein, bevor abgesenkt wird."
+        }
+      },
+      "sperre": {
+        "title": "Sperre (Außentemperatur / Freigabe)",
+        "data": {
+          "aussentemperatur_sensor": "Außentemperatur-Sensor (optional)",
+          "aussentemperatur_grenze": "Außentemperatur-Grenze",
+          "freigabe_entitaet": "Freigabe / Sommerschalter (optional)",
+          "sperre_wirkung": "Wirkung der Sperre",
+          "sperre_mindesthaltezeit": "Mindesthaltezeit der Sperre"
+        },
+        "description": "Die Rückkehr bei Ankunft läuft immer, auch während der Sperre.",
+        "data_description": {
+          "aussentemperatur_sensor": "Ab der Grenze (keine Hysterese) wird gesperrt. Ein unbekannter Wert sperrt nicht.",
+          "freigabe_entitaet": "Nur wenn diese Entität „an“ ist, darf die Abwesenheitslogik arbeiten. Leer = immer.",
+          "sperre_wirkung": "Zeitplan: Abwesenheit/Vorheizen pausieren, Räume folgen ihrem Zeitplan (Blueprint-Verhalten). Heizung aus: Räume im Auto-Modus werden abgeschaltet (Sommerbetrieb).",
+          "sperre_mindesthaltezeit": "Ein Wechsel gesperrt ↔ frei durch die Außentemperatur wird erst übernommen, wenn der bisherige Zustand so lange bestand (verhindert ständiges Umschalten um die Grenze). Die Grenze selbst bleibt exakt. Die Freigabe-Entität wirkt sofort."
+        }
+      },
+      "luft": {
+        "title": "Luft: Außenwerte",
+        "data": {
+          "luft_aussentemperatur": "Außentemperatur für Luft (optional)",
+          "luft_aussenfeuchte": "Außenluftfeuchte (optional)",
+          "wetter_entitaet": "Wetter-Entität für Regen (optional)"
+        },
+        "description": "Für absolute Feuchte, Schimmelrisiko und Lüftempfehlungen. Alles optional.",
+        "data_description": {
+          "luft_aussentemperatur": "Leer = Sensor der Sperre (Schritt 3).",
+          "luft_aussenfeuchte": "Für absolute Feuchte außen („Lüften sinnvoll“).",
+          "wetter_entitaet": "Regen, Gewitter, Hagel und Schneeregen verhindern die Feuchte-Lüftempfehlung und lösen „Fenster offen bei Regen“ aus."
+        }
+      },
+      "beratung": {
+        "title": "Beratung: Benachrichtigungen",
+        "data": {
+          "beratung_push": "Push an anwesende Personen",
+          "beratung_alexa": "Sprachansage (z. B. Alexa)",
+          "beratung_panel": "Wanddisplay (z. B. NSPanel)",
+          "beratung_push_zuordnung": "Zuordnung Person → Push-Dienst",
+          "beratung_alexa_skript": "Skript für Sprachansagen",
+          "beratung_panel_dienst": "Dienst für das Wanddisplay",
+          "beratung_stumm": "Stummschalter (sperren Sprachansagen)",
+          "beratung_ruhe_beginn": "Ruhezeit ab",
+          "beratung_ruhe_ende": "Ruhezeit bis",
+          "beratung_abstand": "Mindestabstand je Thema und Raum"
+        },
+        "description": "Eingeschaltet wird die Beratung über den Schalter „PM Klima Beratung“ (Standard aus).",
+        "data_description": {
+          "beratung_push_zuordnung": "Eine Zeile je Person, z. B. „person.anna: notify.mobile_app_annas_iphone“. Push geht nur an anwesende Personen (bei Abwesenheit aller nur Frost/Fenster an alle). Leer = kein Push.",
+          "beratung_alexa_skript": "Skript für Sprachansagen, aufgerufen mit message, type=tts und title (z. B. ein Skript um notify.alexa_media). Leer = keine Ansage. Zusätzlich gelten die Stummschalter.",
+          "beratung_panel_dienst": "Dienst mit den Feldern label und message, z. B. eine ESPHome-Aktion für ein Wanddisplay (esphome.GERÄT_notification_show). Leer = keine Anzeige.",
+          "beratung_stumm": "Ist einer davon an, gibt es keine Sprachansage (Beratung ist keine Sicherheitsmeldung).",
+          "beratung_ruhe_beginn": "In der Ruhezeit kein Push und keine Sprachansage – außer Frostgefahr. Das Wanddisplay zeigt weiter an.",
+          "beratung_abstand": "Dieselbe Meldung für denselben Raum frühestens nach dieser Zeit erneut. Zwischen zwei beliebigen Meldungen liegen mindestens 10 Minuten."
+        }
+      }
+    },
+    "error": {
+      "richtung_ohne_abstand": "Richtungssensoren benötigen Abstandssensoren."
+    }
+  },
+  "config_subentries": {
+    "raum": {
+      "entry_type": "Raum",
+      "initiate_flow": {
+        "user": "Raum hinzufügen",
+        "reconfigure": "Raum bearbeiten"
+      },
+      "step": {
+        "user": {
+          "title": "Raum: Geräte",
+          "data": {
+            "name": "Raumname",
+            "klimageraete": "Thermostate (climate-Entitäten)",
+            "temperatursensor": "Externer Temperatursensor (optional)",
+            "feuchtesensor": "Externer Feuchtesensor (optional)",
+            "fenstersensoren": "Fenster-/Türsensoren (optional)",
+            "zeitplan": "Zeitplan (schedule-Helfer, optional)",
+            "zeitplan_attribut": "Temperatur-Schlüssel in den Blockdaten"
+          },
+          "description": "Welche Thermostate und Sensoren gehören zum Raum?",
+          "data_description": {
+            "klimageraete": "Beliebige climate-Entitäten (z. B. Zigbee, Homematic, HomeKit Device, Matter, tado). Gesteuert wird nur über die Heiz-Betriebsart (heat, sonst heat_cool bzw. auto), „off“ und die Solltemperatur. Geräte ohne „off“ erhalten ihre niedrigste Solltemperatur.",
+            "zeitplan": "Im Block gilt die Blocktemperatur (Blockdaten, z. B. temperatur: 21) oder die Komforttemperatur, außerhalb die Eco-Temperatur. Ohne Zeitplan gilt immer die Komforttemperatur.",
+            "zeitplan_attribut": "Schlüssel in den „Zusätzlichen Daten“ des Zeitblocks."
+          }
+        },
+        "temperaturen": {
+          "title": "Raum: Temperaturen",
+          "data": {
+            "komforttemperatur": "Komforttemperatur (im Zeitblock)",
+            "ecotemperatur": "Eco-Temperatur (außerhalb der Blöcke)",
+            "frostschutztemperatur": "Frostschutztemperatur",
+            "min_temperatur": "Minimale Solltemperatur",
+            "max_temperatur": "Maximale Solltemperatur (auch Boost)"
+          }
+        },
+        "verhalten": {
+          "title": "Raum: Verhalten",
+          "data": {
+            "overlay_modus": "Manuelle Änderung im Auto-Modus gilt",
+            "overlay_minuten": "Dauer bei „für X Minuten“",
+            "boost_minuten": "Boost-Dauer",
+            "fenster_verzoegerung_offen": "Fenster: Verzögerung beim Öffnen",
+            "fenster_verzoegerung_zu": "Fenster: Verzögerung beim Schließen",
+            "fenster_aktion": "Bei offenem Fenster",
+            "aus_mit_frostschutz": "Modus „Aus“ hält Frostschutz",
+            "externe_aenderung_uebernehmen": "Änderungen direkt am Thermostat übernehmen",
+            "extern_aus_als_fenster": "Externes Aus als Fensteröffnung werten"
+          },
+          "data_description": {
+            "externe_aenderung_uebernehmen": "Ein am Thermostat gedrehter Wert wird wie eine manuelle Änderung behandelt. Aus: der Wert wird zurückgesetzt.",
+            "extern_aus_als_fenster": "Für Thermostate mit eigener Fenstererkennung, die dabei auf „aus“ schalten (z. B. tado). An: ein externes „aus“ gilt als offenes Fenster – 30 min Frostschutz, danach geht es normal weiter; solange das Thermostat „aus“ meldet, wird nichts gesendet. Aus: ein externes „aus“ wird zurückgestellt. Vorschlag: an bei tado-Thermostaten ohne Fenstersensor."
+          }
+        },
+        "luft": {
+          "title": "Raum: Luft (optional)",
+          "data": {
+            "co2_sensor": "CO₂-Sensor (optional)",
+            "pm25_sensor": "PM2,5-Sensor (optional)",
+            "nassraum": "Nassraum (Bad, Duschen-Erkennung)",
+            "feuchte_grenze": "Feuchte-Grenze für „Lüften nötig“",
+            "frsi": "Temperaturfaktor fRsi der Außenwand",
+            "luftreiniger": "Luftreiniger (optional)",
+            "luftreiniger_filter": "Filter-Sensoren (% oder Stunden)",
+            "nacht_beginn": "Nacht ab (Luftreiniger Sleep)",
+            "nacht_ende": "Nacht bis",
+            "luftreiniger_pause": "Pause nach manueller Bedienung",
+            "luftreiniger_haltezeit": "Mindesthaltezeit einer Stufe",
+            "luftreiniger_preset_auto": "Preset für Stufe „Auto“",
+            "luftreiniger_preset_sleep": "Preset für Stufe „Sleep“",
+            "luftreiniger_preset_fast": "Preset für Stufe „Fast“",
+            "luftreiniger_preset_turbo": "Preset für Stufe „Turbo“"
+          },
+          "description": "Die Luftfeuchte kommt aus dem Feuchtesensor (Schritt 1) oder dem Thermostat.",
+          "data_description": {
+            "nassraum": "Feuchte-Grenze standardmäßig 70 % statt 65 %, schneller Anstieg (+10 Punkte in 20 min) wird als Duschen erkannt.",
+            "feuchte_grenze": "Leer = 65 % (Nassraum 70 %).",
+            "frsi": "Schätzt die kälteste Wandstelle: θsi = θi − (θi − θe)·(1 − fRsi). 0,70 = Mindestwert nach DIN 4108-2 (Altbau eher 0,6–0,7, Neubau 0,8+).",
+            "luftreiniger": "Gesteuert wird über Presets (Namen je Stufe unten einstellbar) oder – bei Geräten ohne Presets – über die Drehzahl. Die Automatik wird über den Schalter „Luftreiniger-Automatik“ aktiviert (Standard aus).",
+            "luftreiniger_filter": "Hinweis unter 10 % bzw. unter 7 Tagen (168 h).",
+            "luftreiniger_pause": "Wird der Luftreiniger am Gerät oder in der App bedient, pausiert die Automatik so lange.",
+            "luftreiniger_preset_auto": "Preset-Name des Geräts für diese Stufe (Groß-/Kleinschreibung egal). Leer = „Auto“. Geräte ohne Presets werden über die Drehzahl gesteuert (Sleep 25 %, Auto 50 %, Fast 75 %, Turbo 100 %)."
+          }
+        }
+      },
+      "error": {
+        "name_ungueltig": "Bitte einen gültigen Namen eingeben.",
+        "name_vorhanden": "Ein Raum mit diesem Namen existiert bereits.",
+        "thermostat_vergeben": "Das Thermostat {thermostat} ist bereits dem Raum „{raum}“ zugeordnet. Ein Thermostat darf nur in einem Raum vorkommen.",
+        "eigene_entitaet": "PM-Klima-Entitäten können nicht als Thermostat gewählt werden.",
+        "min_max": "Das Minimum muss kleiner als das Maximum sein.",
+        "ausser_bereich": "Komfort- und Eco-Temperatur müssen zwischen Minimum und Maximum liegen."
+      },
+      "abort": {
+        "reconfigure_successful": "Raum wurde aktualisiert."
+      }
+    }
+  },
+  "selector": {
+    "vorheizstufe": {
+      "options": {
+        "aus": "Aus – erst bei Ankunft heizen",
+        "eco": "Eco – spät vorheizen",
+        "balance": "Balance – Kompromiss",
+        "komfort": "Komfort – früh vorheizen",
+        "eigene": "Benutzerdefiniert"
+      }
+    },
+    "sperre_wirkung": {
+      "options": {
+        "zeitplan": "Nur Abwesenheit/Vorheizen aussetzen (Zeitplan läuft)",
+        "aus": "Heizung im Auto-Modus aus (Sommer)"
+      }
+    },
+    "overlay_modus": {
+      "options": {
+        "naechster_block": "Bis zum nächsten Zeitplanwechsel",
+        "timer": "Für X Minuten",
+        "dauerhaft": "Dauerhaft (bis „Auto“)"
+      }
+    },
+    "fenster_aktion": {
+      "options": {
+        "frostschutz": "Frostschutztemperatur",
+        "aus": "Thermostat aus"
+      }
+    },
+    "kanal": {
+      "options": {
+        "push": "Push",
+        "alexa": "Sprachansage",
+        "panel": "Wanddisplay"
+      }
+    },
+    "thema": {
+      "options": {
+        "frostgefahr": "Frostgefahr",
+        "heizen_fenster": "Heizen bei offenem Fenster",
+        "schimmel": "Schimmelrisiko",
+        "fenster_schliessen": "Fenster schließen",
+        "fenster_regen": "Fenster offen bei Regen",
+        "lueften_co2": "Lüften (CO₂)",
+        "lueften_feuchte": "Lüften (Feuchte)",
+        "feinstaub": "Feinstaub",
+        "zu_trocken": "Zu trocken",
+        "filter": "Filterwartung"
+      }
+    },
+    "sprache": {
+      "options": {
+        "auto": "Automatisch (Sprache von Home Assistant)",
+        "de": "Deutsch",
+        "en": "Englisch"
+      }
+    }
+  },
+  "entity": {
+    "climate": {
+      "raum": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "none": "Kein",
+              "zeitplan": "Zeitplan",
+              "manuell": "Manuell",
+              "komfort": "Komfort",
+              "eco": "Eco",
+              "abwesend": "Abwesend",
+              "frostschutz": "Frostschutz",
+              "boost": "Boost"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "grund": {
+        "name": "Grund",
+        "state": {
+          "zeitplan": "Zeitplan",
+          "abwesenheit": "Abwesenheit",
+          "vorheizen": "Vorheizen",
+          "fenster": "Fenster offen",
+          "fenster_extern": "Fenster (Thermostat)",
+          "sperre": "Sperre",
+          "manuell": "Manuell",
+          "boost": "Boost",
+          "aus": "Aus",
+          "pausiert": "Pausiert"
+        }
+      },
+      "abwesenheitsphase": {
+        "name": "Abwesenheitsphase",
+        "state": {
+          "zuhause": "Zuhause",
+          "komfort": "Komfort (Vorheizen)",
+          "zwischen": "Zwischenstufe",
+          "halten": "Halten",
+          "fern": "Fern"
+        }
+      },
+      "luftqualitaet": {
+        "name": "Qualität",
+        "state": {
+          "gut": "Gut",
+          "mittel": "Mittel",
+          "schlecht": "Schlecht"
+        }
+      },
+      "schimmelrisiko": {
+        "name": "Schimmelrisiko"
+      },
+      "lueftdauer": {
+        "name": "Lüftdauer"
+      },
+      "klima_empfehlung": {
+        "name": "Empfehlung"
+      }
+    },
+    "binary_sensor": {
+      "fenster_offen": {
+        "name": "Fenster offen"
+      },
+      "lueften_empfohlen": {
+        "name": "Lüften empfohlen"
+      }
+    },
+    "switch": {
+      "aktiv": {
+        "name": "Heizung aktiv"
+      },
+      "beratung": {
+        "name": "Beratung"
+      },
+      "luftreiniger_automatik": {
+        "name": "Luftreiniger-Automatik"
+      }
+    }
+  },
+  "issues": {
+    "extern_aus": {
+      "title": "Thermostat in {raum} wird wiederholt ausgeschaltet",
+      "description": "Das Thermostat im Raum {raum} wurde in 30 Minuten {anzahl}-mal von außen ausgeschaltet (am Gerät, in der Hersteller-App oder durch die Hersteller-Cloud). PM Klima stellt es nicht mehr sofort zurück, sondern wartet {pause} Minuten bzw. bis zur nächsten eigenen Änderung – das schont Batterie und ggf. das Kontingent der Hersteller-API.\n\nBitte in der Hersteller-App prüfen, ob Geofencing/Abwesenheit, ein eigener Zeitplan oder die Fenster-offen-Erkennung parallel eingreifen (bei tado: tado-App). Soll ein externes Aus in diesem Raum als Fensteröffnung gelten, im Raum „Externes Aus als Fensteröffnung werten“ einschalten. Ausschalten bitte über {entitaet}.\n\nDieser Hinweis verschwindet von selbst nach 60 Minuten ohne externes Aus."
+    },
+    "thermostat_fehlt": {
+      "title": "Thermostat für {raum} nicht gefunden",
+      "description": "Im Raum {raum} ist ein Thermostat konfiguriert, das es nicht mehr gibt: {entitaeten}. Wurde z. B. die tado-Integration entfernt, bitte die neue (lokale) Entität eintragen – im Raum „Raum bearbeiten“ oder mit dem Dienst pm_heizung.entitaet_ersetzen. Der Hinweis verschwindet nach dem nächsten Start ohne fehlendes Thermostat."
+    }
+  },
+  "exceptions": {
+    "beratung_nicht_verfuegbar": {
+      "message": "Die Beratung ist nicht verfügbar (Integration nicht geladen)."
+    },
+    "nicht_geladen": {
+      "message": "PM Klima ist nicht geladen."
+    },
+    "domain_verschieden": {
+      "message": "{alt} und {neu} haben unterschiedliche Domains."
+    },
+    "entitaet_fehlt": {
+      "message": "Die Entität {entitaet} existiert nicht."
+    },
+    "nicht_verwendet": {
+      "message": "{entitaet} wird in PM Klima nicht verwendet."
+    },
+    "thermostat_vergeben": {
+      "message": "{entitaet} ist bereits dem Raum „{raum}“ zugeordnet."
+    }
+  },
+  "services": {
+    "boost": {
+      "name": "Boost",
+      "description": "Heizt den Raum für die angegebene Dauer mit der Höchsttemperatur, danach geht es normal weiter.",
+      "fields": {
+        "dauer": {
+          "name": "Dauer",
+          "description": "Minuten; leer = Raumeinstellung."
+        }
+      }
+    },
+    "set_overlay": {
+      "name": "Manuelle Temperatur setzen",
+      "description": "Setzt eine manuelle Solltemperatur (wie am Thermostat gedreht).",
+      "fields": {
+        "temperatur": {
+          "name": "Temperatur",
+          "description": "Solltemperatur in °C."
+        },
+        "dauer": {
+          "name": "Dauer",
+          "description": "Minuten; leer = Raumeinstellung, 0 = dauerhaft."
+        }
+      }
+    },
+    "clear_overlay": {
+      "name": "Zurück zum Zeitplan",
+      "description": "Beendet manuelle Temperatur und Boost."
+    },
+    "reevaluate": {
+      "name": "Neu berechnen",
+      "description": "Berechnet Zentrale und alle Räume neu und gleicht die Thermostate ab."
+    },
+    "abhaengigkeiten": {
+      "name": "Abhängigkeiten prüfen",
+      "description": "Listet alle konfigurierten Entitäten mit Integration und zeigt, ob noch etwas von einer Cloud-Integration (z. B. tado) abhängt. Antwort: tado_integration_entbehrlich = true, sobald nichts mehr die tado-Integration benötigt."
+    },
+    "entitaet_ersetzen": {
+      "name": "Entität ersetzen",
+      "description": "Ersetzt eine Entität in der Zentrale und in allen Räumen, z. B. das tado-Cloud-Thermostat durch die lokale HomeKit-Entität. Zeitpläne, Einstellungen und Zustände bleiben erhalten; die Integration lädt danach neu.",
+      "fields": {
+        "alt": {
+          "name": "Bisherige Entität",
+          "description": "Darf bereits gelöscht sein."
+        },
+        "neu": {
+          "name": "Neue Entität",
+          "description": "Muss dieselbe Domain haben."
+        }
+      }
+    },
+    "beratung_testen": {
+      "name": "Beratung testen",
+      "description": "Sendet eine Testmeldung an einen Kanal – ohne Drosselung, Ruhezeit, Stummschalter und Anwesenheitsprüfung.",
+      "fields": {
+        "kanal": {
+          "name": "Kanal",
+          "description": "Push, Sprachansage oder Wanddisplay."
+        },
+        "thema": {
+          "name": "Thema (optional)",
+          "description": "Mit Thema wird eine Beispielmeldung dieses Themas gesendet, sonst ein Testtext."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+homeassistant:
+  name: Demo-Wohnung
+  country: DE
+  language: de
+  time_zone: Europe/Berlin
+  unit_system: metric
+  currency: EUR
+  latitude: 52.52
+  longitude: 13.40
+  elevation: 34
+
+frontend:
+config:
+http:
+api:
+history:
+logbook:
+person:
+system_health:
+repairs:
+lovelace:
+
+input_boolean:
+  anna_zuhause: {name: Anna zuhause, initial: true}
+  ben_zuhause: {name: Ben zuhause, initial: false}
+  heizperiode: {name: Heizperiode, initial: true}
+  fenster_wohnzimmer_sim: {name: Fenster Wohnzimmer (Simulation), initial: false}
+  fenster_kueche_sim: {name: Fenster Küche (Simulation), initial: true}
+  heizung_wohnzimmer: {name: Heizkreis Wohnzimmer}
+  heizung_kueche: {name: Heizkreis Küche}
+  heizung_schlafzimmer: {name: Heizkreis Schlafzimmer}
+  heizung_bad: {name: Heizkreis Bad}
+
+template:
+  - sensor:
+      - {name: Wohnzimmer Temperatur, unique_id: t_wz, unit_of_measurement: "°C", device_class: temperature, state_class: measurement, state: "20.6"}
+      - {name: Küche Temperatur, unique_id: t_ku, unit_of_measurement: "°C", device_class: temperature, state_class: measurement, state: "19.2"}
+      - {name: Schlafzimmer Temperatur, unique_id: t_sz, unit_of_measurement: "°C", device_class: temperature, state_class: measurement, state: "17.8"}
+      - {name: Bad Temperatur, unique_id: t_bad, unit_of_measurement: "°C", device_class: temperature, state_class: measurement, state: "22.4"}
+      - {name: Wohnzimmer Luftfeuchte, unique_id: h_wz, unit_of_measurement: "%", device_class: humidity, state_class: measurement, state: "52"}
+      - {name: Küche Luftfeuchte, unique_id: h_ku, unit_of_measurement: "%", device_class: humidity, state_class: measurement, state: "58"}
+      - {name: Schlafzimmer Luftfeuchte, unique_id: h_sz, unit_of_measurement: "%", device_class: humidity, state_class: measurement, state: "63"}
+      - {name: Bad Luftfeuchte, unique_id: h_bad, unit_of_measurement: "%", device_class: humidity, state_class: measurement, state: "74"}
+      - {name: Wohnzimmer CO2, unique_id: co2_wz, unit_of_measurement: "ppm", device_class: carbon_dioxide, state_class: measurement, state: "1180"}
+      - {name: Wohnzimmer PM2.5, unique_id: pm_wz, unit_of_measurement: "µg/m³", device_class: pm25, state_class: measurement, state: "8"}
+      - {name: Außentemperatur, unique_id: t_out, unit_of_measurement: "°C", device_class: temperature, state_class: measurement, state: "6.5"}
+      - {name: Außenluftfeuchte, unique_id: h_out, unit_of_measurement: "%", device_class: humidity, state_class: measurement, state: "81"}
+      - {name: Luftreiniger Filter, unique_id: filter_wz, unit_of_measurement: "%", state: "64"}
+  - binary_sensor:
+      - {name: Fenster Wohnzimmer, unique_id: w_wz, device_class: window, state: "{{ is_state('input_boolean.fenster_wohnzimmer_sim','on') }}"}
+      - {name: Fenster Küche, unique_id: w_ku, device_class: window, state: "{{ is_state('input_boolean.fenster_kueche_sim','on') }}"}
+      - {name: Fenster Bad, unique_id: w_bad, device_class: window, state: "off"}
+
+fan:
+  - platform: template
+    fans:
+      luftreiniger_wohnzimmer:
+        friendly_name: Luftreiniger Wohnzimmer
+        unique_id: fan_wz
+        value_template: "on"
+        preset_mode_template: "Auto"
+        preset_modes: [Auto, Sleep, Fast, Turbo]
+        turn_on: []
+        turn_off: []
+        set_preset_mode: []
+
+climate:
+  - {platform: generic_thermostat, name: Thermostat Wohnzimmer, unique_id: th_wz, heater: input_boolean.heizung_wohnzimmer, target_sensor: sensor.wohnzimmer_temperatur, min_temp: 5, max_temp: 25, target_temp_step: 0.5, precision: 0.1}
+  - {platform: generic_thermostat, name: Thermostat Küche, unique_id: th_ku, heater: input_boolean.heizung_kueche, target_sensor: sensor.kuche_temperatur, min_temp: 5, max_temp: 25, target_temp_step: 0.5, precision: 0.1}
+  - {platform: generic_thermostat, name: Thermostat Schlafzimmer, unique_id: th_sz, heater: input_boolean.heizung_schlafzimmer, target_sensor: sensor.schlafzimmer_temperatur, min_temp: 5, max_temp: 25, target_temp_step: 0.5, precision: 0.1}
+  - {platform: generic_thermostat, name: Thermostat Bad, unique_id: th_bad, heater: input_boolean.heizung_bad, target_sensor: sensor.bad_temperatur, min_temp: 5, max_temp: 25, target_temp_step: 0.5, precision: 0.1}
+
+schedule:
+  heizplan_wohnzimmer:
+    name: Heizplan Wohnzimmer
+    monday: &wz [{from: "06:30:00", to: "08:30:00", data: {temperatur: 21}}, {from: "16:00:00", to: "22:30:00", data: {temperatur: 21.5}}]
+    tuesday: *wz
+    wednesday: *wz
+    thursday: *wz
+    friday: *wz
+    saturday: &wzwe [{from: "08:00:00", to: "23:00:00", data: {temperatur: 21.5}}]
+    sunday: *wzwe
+  heizplan_kueche:
+    name: Heizplan Küche
+    monday: &ku [{from: "06:30:00", to: "08:00:00"}, {from: "17:00:00", to: "20:30:00"}]
+    tuesday: *ku
+    wednesday: *ku
+    thursday: *ku
+    friday: *ku
+    saturday: [{from: "08:00:00", to: "21:00:00"}]
+    sunday: [{from: "08:00:00", to: "21:00:00"}]
+  heizplan_schlafzimmer:
+    name: Heizplan Schlafzimmer
+    monday: &sz [{from: "21:00:00", to: "23:00:00", data: {temperatur: 18}}]
+    tuesday: *sz
+    wednesday: *sz
+    thursday: *sz
+    friday: *sz
+    saturday: *sz
+    sunday: *sz
+  heizplan_bad:
+    name: Heizplan Bad
+    monday: &bad [{from: "06:00:00", to: "07:30:00", data: {temperatur: 23}}, {from: "20:00:00", to: "21:30:00", data: {temperatur: 22}}]
+    tuesday: *bad
+    wednesday: *bad
+    thursday: *bad
+    friday: *bad
+    saturday: *bad
+    sunday: *bad

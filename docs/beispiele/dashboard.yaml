@@ -1,0 +1,107 @@
+# Beispiel-Dashboard für PM Klima (Sections-Ansicht).
+# Einfügen: Dashboard bearbeiten → ⋮ → Raw-Konfigurationseditor, Raumnamen anpassen.
+title: Klima
+views:
+  - title: Klima
+    path: klima
+    icon: mdi:thermostat
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Räume
+            icon: mdi:home-thermometer
+          - type: tile
+            entity: climate.pm_wohnzimmer
+            name: Wohnzimmer
+            state_content: anzeige
+            grid_options:
+              columns: 12
+            features_position: bottom
+            features:
+              - type: target-temperature
+          - type: tile
+            entity: climate.pm_kuche
+            name: Küche
+            state_content: anzeige
+            grid_options:
+              columns: 12
+            features_position: bottom
+            features:
+              - type: target-temperature
+          - type: tile
+            entity: climate.pm_schlafzimmer
+            name: Schlafzimmer
+            state_content: anzeige
+            grid_options:
+              columns: 12
+            features_position: bottom
+            features:
+              - type: target-temperature
+          - type: tile
+            entity: climate.pm_bad
+            name: Bad
+            state_content: anzeige
+            grid_options:
+              columns: 12
+            features_position: bottom
+            features:
+              - type: target-temperature
+      - type: grid
+        cards:
+          - type: heading
+            heading: Wohnzimmer
+            icon: mdi:sofa
+          - type: thermostat
+            entity: climate.pm_wohnzimmer
+            name: Wohnzimmer
+            features:
+              - type: climate-preset-modes
+                style: dropdown
+              - type: climate-hvac-modes
+                hvac_modes: [auto, heat, "off"]
+      - type: grid
+        cards:
+          - type: heading
+            heading: Luft
+            icon: mdi:air-filter
+          - type: tile
+            entity: sensor.pm_wohnzimmer_luftqualitaet
+            name: Wohnzimmer
+          - type: tile
+            entity: sensor.pm_bad_luftqualitaet
+            name: Bad
+          - type: tile
+            entity: sensor.pm_bad_schimmelrisiko
+            name: Schimmel Bad
+          - type: tile
+            entity: binary_sensor.pm_wohnzimmer_lueften_empfohlen
+            name: Lüften WZ
+          - type: markdown
+            title: Empfehlungen
+            content: |-
+              {% set liste = state_attr('sensor.pm_klima_empfehlung', 'liste') or [] %}
+              {% for e in liste %}
+              - **{{ e.raum }}** · {{ e.text.split(': ', 1)[1] if ': ' in e.text else e.text }}
+              {% else %}
+              Keine Empfehlung.
+              {% endfor %}
+      - type: grid
+        cards:
+          - type: heading
+            heading: Zentrale
+            icon: mdi:home-account
+          - type: tile
+            entity: sensor.pm_heizung_abwesenheitsphase
+            name: Phase
+          - type: tile
+            entity: switch.pm_heizung_aktiv
+            name: Heizung
+          - type: tile
+            entity: switch.pm_klima_beratung
+            name: Beratung
+          - type: tile
+            entity: switch.pm_wohnzimmer_luftreiniger_automatik
+            name: Luftreiniger

@@ -1,0 +1,14 @@
+name: Funktionswunsch
+description: Idee oder Erweiterung vorschlagen.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: wunsch
+    attributes:
+      label: Was soll PM Klima können?
+    validations:
+      required: true
+  - type: textarea
+    id: nutzen
+    attributes:
+      label: Wofür wird es gebraucht?

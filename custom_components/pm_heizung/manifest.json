@@ -1,0 +1,15 @@
+{
+  "domain": "pm_heizung",
+  "name": "PM Klima",
+  "codeowners": [
+    "@D0GC"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/D0GC/HA-PM-Networks-Klima",
+  "integration_type": "hub",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/D0GC/HA-PM-Networks-Klima/issues",
+  "requirements": [],
+  "version": "2.1.0"
+}

@@ -1,0 +1,114 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install ruff==0.16.9
+      - run: ruff check .
+      - run: ruff format --check .
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements_test.txt
+      - run: pip install -r requirements_test.txt
+      - name: Übersetzungen aktuell?
+        run: |
+          python tools/gen_translations.py
+          git diff --exit-code custom_components/pm_heizung/strings.json custom_components/pm_heizung/translations
+      - run: python -m pytest -q
+
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hacs/action@main
+        with:
+          category: integration
+
+  release:
+    needs: [lint, tests, hassfest, hacs]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version prüfen (Tag = manifest.json)
+        id: version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          MANIFEST_VERSION="$(python3 -c 'import json; print(json.load(open("custom_components/pm_heizung/manifest.json", encoding="utf-8"))["version"])')"
+          if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "::error::Tag-Version $TAG_VERSION passt nicht zu manifest.json ($MANIFEST_VERSION)"
+            exit 1
+          fi
+          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Release-Text aus CHANGELOG.md
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+
+          version = os.environ["VERSION"]
+          lines = open("CHANGELOG.md", encoding="utf-8").read().splitlines()
+          start = None
+          for i, line in enumerate(lines):
+              if re.match(rf"^## {re.escape(version)}(\s|$)", line):
+                  start = i + 1
+                  break
+          if start is None:
+              print(f"::error::Kein Abschnitt '## {version}' in CHANGELOG.md")
+              sys.exit(1)
+          end = next(
+              (j for j in range(start, len(lines)) if lines[j].startswith("## ")),
+              len(lines),
+          )
+          body = "\n".join(lines[start:end]).strip()
+          if not body:
+              print(f"::error::Abschnitt '## {version}' in CHANGELOG.md ist leer")
+              sys.exit(1)
+          with open("release_body.md", "w", encoding="utf-8") as f:
+              f.write(body + "\n")
+          print(body)
+          PY
+
+      - name: ZIP erstellen
+        run: |
+          cd custom_components/pm_heizung
+          zip -r "$GITHUB_WORKSPACE/pm_heizung.zip" . -x '*__pycache__*' '*.pyc'
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: PM Klima ${{ steps.version.outputs.version }}
+          body_path: release_body.md
+          draft: false
+          prerelease: false
+          make_latest: true
+          files: pm_heizung.zip

@@ -1,0 +1,542 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Persons & proximity",
+        "data": {
+          "personen": "Persons",
+          "anwesenheit_entitaeten": "Presence entities (optional)",
+          "abstand_sensoren": "Proximity distance sensors",
+          "richtung_sensoren": "Proximity direction sensors",
+          "sprache": "Language of generated texts"
+        },
+        "description": "Who is evaluated for away and preheat?",
+        "data_description": {
+          "anwesenheit_entitaeten": "If set, 'someone home' = at least one entity is on (recommended for debounced helpers). Otherwise the person state 'home' is used.",
+          "abstand_sensoren": "One proximity distance sensor per person. Without sensors only the setback (phase hold) is used.",
+          "richtung_sensoren": "Select in the same order as the distance sensors (evaluated pairwise). Different counts are aggregated.",
+          "sprache": "Applies to display texts, recommendations and advice messages. Automatic = Home Assistant language (German for de, otherwise English)."
+        }
+      },
+      "abwesenheit": {
+        "title": "Away & preheat",
+        "data": {
+          "absenkung": "Setback when away",
+          "mindesttemperatur": "Minimum temperature when away",
+          "fern_absenkung": "Additional far setback",
+          "vorheizstufe": "Preheat level",
+          "eigener_nahradius": "Custom near radius",
+          "eigener_mittelradius": "Custom middle radius",
+          "eigener_fernradius": "Custom far radius",
+          "annaeherung_erforderlich": "Approach required",
+          "verlassen_verzoegerung": "Leave delay"
+        },
+        "description": "Geofencing: setback when away, preheat when approaching.",
+        "data_description": {
+          "absenkung": "Hold temperature = room comfort − setback (never above the current schedule temperature).",
+          "fern_absenkung": "Extra setback when everyone is beyond the far radius. 0 = off.",
+          "vorheizstufe": "Near/middle/far: Eco 1.5/4/15 km · Balance 4/10/25 km · Comfort 10/25/50 km · Off: no preheating (far 25 km).",
+          "annaeherung_erforderlich": "Preheat only when heading 'towards'. A reached level is kept unless someone reports 'away_from' or leaves the radius.",
+          "verlassen_verzoegerung": "Nobody must be home this long before the setback starts."
+        }
+      },
+      "sperre": {
+        "title": "Lock (outdoor temperature / release)",
+        "data": {
+          "aussentemperatur_sensor": "Outdoor temperature sensor (optional)",
+          "aussentemperatur_grenze": "Outdoor temperature limit",
+          "freigabe_entitaet": "Release / summer switch (optional)",
+          "sperre_wirkung": "Lock effect",
+          "sperre_mindesthaltezeit": "Minimum lock hold time"
+        },
+        "description": "Returning on arrival always works, even while locked.",
+        "data_description": {
+          "aussentemperatur_sensor": "At or above the limit (no hysteresis) the lock is active. Unknown values never lock.",
+          "freigabe_entitaet": "Absence logic only works while this entity is on. Empty = always.",
+          "sperre_wirkung": "Schedule: pause absence/preheat, rooms follow their schedule. Heating off: rooms in auto mode are switched off (summer).",
+          "sperre_mindesthaltezeit": "A lock change caused by the outdoor temperature is only applied after the previous state lasted this long (prevents toggling around the limit). The limit itself stays exact. The release entity acts immediately."
+        }
+      },
+      "luft": {
+        "title": "Air: outdoor values",
+        "data": {
+          "luft_aussentemperatur": "Outdoor temperature for air (optional)",
+          "luft_aussenfeuchte": "Outdoor humidity (optional)",
+          "wetter_entitaet": "Weather entity for rain (optional)"
+        },
+        "description": "Used for absolute humidity, mould risk and ventilation advice. All optional.",
+        "data_description": {
+          "luft_aussentemperatur": "Empty = lock sensor (step 3).",
+          "luft_aussenfeuchte": "Used for absolute outdoor humidity ('ventilation sensible').",
+          "wetter_entitaet": "Rain, thunderstorm, hail and sleet block humidity ventilation advice and trigger 'window open while raining'."
+        }
+      },
+      "beratung": {
+        "title": "Advice: notifications",
+        "data": {
+          "beratung_push": "Push to persons at home",
+          "beratung_alexa": "Voice announcement (e.g. Alexa)",
+          "beratung_panel": "Wall display (e.g. NSPanel)",
+          "beratung_push_zuordnung": "Mapping person → push service",
+          "beratung_alexa_skript": "Script for voice announcements",
+          "beratung_panel_dienst": "Service for the wall display",
+          "beratung_stumm": "Mute switches (block voice announcements)",
+          "beratung_ruhe_beginn": "Quiet time from",
+          "beratung_ruhe_ende": "Quiet time until",
+          "beratung_abstand": "Minimum interval per topic and room"
+        },
+        "description": "Advice is enabled with the switch 'PM Klima advice' (default off).",
+        "data_description": {
+          "beratung_push_zuordnung": "One line per person, e.g. 'person.anna: notify.mobile_app_annas_iphone'. Push goes to persons at home only (when everyone is away: frost/window to all). Empty = no push.",
+          "beratung_alexa_skript": "Script for voice announcements, called with message, type=tts and title (e.g. a script around notify.alexa_media). Empty = no announcement. The mute switches apply in addition.",
+          "beratung_panel_dienst": "Service with fields label and message, e.g. an ESPHome action for a wall display (esphome.DEVICE_notification_show). Empty = no display.",
+          "beratung_stumm": "If any is on, no voice announcement is made (advice is not a safety message).",
+          "beratung_ruhe_beginn": "No push and no voice announcement during quiet time – except frost risk. The wall display still shows messages.",
+          "beratung_abstand": "The same message for the same room is repeated at most after this time. Any two messages are at least 10 minutes apart."
+        }
+      }
+    },
+    "error": {
+      "richtung_ohne_abstand": "Direction sensors require distance sensors."
+    },
+    "abort": {
+      "already_configured": "PM Klima is already set up. Add rooms via 'Add room'."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "title": "Persons & proximity",
+        "data": {
+          "personen": "Persons",
+          "anwesenheit_entitaeten": "Presence entities (optional)",
+          "abstand_sensoren": "Proximity distance sensors",
+          "richtung_sensoren": "Proximity direction sensors",
+          "sprache": "Language of generated texts"
+        },
+        "description": "Who is evaluated for away and preheat?",
+        "data_description": {
+          "anwesenheit_entitaeten": "If set, 'someone home' = at least one entity is on (recommended for debounced helpers). Otherwise the person state 'home' is used.",
+          "abstand_sensoren": "One proximity distance sensor per person. Without sensors only the setback (phase hold) is used.",
+          "richtung_sensoren": "Select in the same order as the distance sensors (evaluated pairwise). Different counts are aggregated.",
+          "sprache": "Applies to display texts, recommendations and advice messages. Automatic = Home Assistant language (German for de, otherwise English)."
+        }
+      },
+      "abwesenheit": {
+        "title": "Away & preheat",
+        "data": {
+          "absenkung": "Setback when away",
+          "mindesttemperatur": "Minimum temperature when away",
+          "fern_absenkung": "Additional far setback",
+          "vorheizstufe": "Preheat level",
+          "eigener_nahradius": "Custom near radius",
+          "eigener_mittelradius": "Custom middle radius",
+          "eigener_fernradius": "Custom far radius",
+          "annaeherung_erforderlich": "Approach required",
+          "verlassen_verzoegerung": "Leave delay"
+        },
+        "description": "Geofencing: setback when away, preheat when approaching.",
+        "data_description": {
+          "absenkung": "Hold temperature = room comfort − setback (never above the current schedule temperature).",
+          "fern_absenkung": "Extra setback when everyone is beyond the far radius. 0 = off.",
+          "vorheizstufe": "Near/middle/far: Eco 1.5/4/15 km · Balance 4/10/25 km · Comfort 10/25/50 km · Off: no preheating (far 25 km).",
+          "annaeherung_erforderlich": "Preheat only when heading 'towards'. A reached level is kept unless someone reports 'away_from' or leaves the radius.",
+          "verlassen_verzoegerung": "Nobody must be home this long before the setback starts."
+        }
+      },
+      "sperre": {
+        "title": "Lock (outdoor temperature / release)",
+        "data": {
+          "aussentemperatur_sensor": "Outdoor temperature sensor (optional)",
+          "aussentemperatur_grenze": "Outdoor temperature limit",
+          "freigabe_entitaet": "Release / summer switch (optional)",
+          "sperre_wirkung": "Lock effect",
+          "sperre_mindesthaltezeit": "Minimum lock hold time"
+        },
+        "description": "Returning on arrival always works, even while locked.",
+        "data_description": {
+          "aussentemperatur_sensor": "At or above the limit (no hysteresis) the lock is active. Unknown values never lock.",
+          "freigabe_entitaet": "Absence logic only works while this entity is on. Empty = always.",
+          "sperre_wirkung": "Schedule: pause absence/preheat, rooms follow their schedule. Heating off: rooms in auto mode are switched off (summer).",
+          "sperre_mindesthaltezeit": "A lock change caused by the outdoor temperature is only applied after the previous state lasted this long (prevents toggling around the limit). The limit itself stays exact. The release entity acts immediately."
+        }
+      },
+      "luft": {
+        "title": "Air: outdoor values",
+        "data": {
+          "luft_aussentemperatur": "Outdoor temperature for air (optional)",
+          "luft_aussenfeuchte": "Outdoor humidity (optional)",
+          "wetter_entitaet": "Weather entity for rain (optional)"
+        },
+        "description": "Used for absolute humidity, mould risk and ventilation advice. All optional.",
+        "data_description": {
+          "luft_aussentemperatur": "Empty = lock sensor (step 3).",
+          "luft_aussenfeuchte": "Used for absolute outdoor humidity ('ventilation sensible').",
+          "wetter_entitaet": "Rain, thunderstorm, hail and sleet block humidity ventilation advice and trigger 'window open while raining'."
+        }
+      },
+      "beratung": {
+        "title": "Advice: notifications",
+        "data": {
+          "beratung_push": "Push to persons at home",
+          "beratung_alexa": "Voice announcement (e.g. Alexa)",
+          "beratung_panel": "Wall display (e.g. NSPanel)",
+          "beratung_push_zuordnung": "Mapping person → push service",
+          "beratung_alexa_skript": "Script for voice announcements",
+          "beratung_panel_dienst": "Service for the wall display",
+          "beratung_stumm": "Mute switches (block voice announcements)",
+          "beratung_ruhe_beginn": "Quiet time from",
+          "beratung_ruhe_ende": "Quiet time until",
+          "beratung_abstand": "Minimum interval per topic and room"
+        },
+        "description": "Advice is enabled with the switch 'PM Klima advice' (default off).",
+        "data_description": {
+          "beratung_push_zuordnung": "One line per person, e.g. 'person.anna: notify.mobile_app_annas_iphone'. Push goes to persons at home only (when everyone is away: frost/window to all). Empty = no push.",
+          "beratung_alexa_skript": "Script for voice announcements, called with message, type=tts and title (e.g. a script around notify.alexa_media). Empty = no announcement. The mute switches apply in addition.",
+          "beratung_panel_dienst": "Service with fields label and message, e.g. an ESPHome action for a wall display (esphome.DEVICE_notification_show). Empty = no display.",
+          "beratung_stumm": "If any is on, no voice announcement is made (advice is not a safety message).",
+          "beratung_ruhe_beginn": "No push and no voice announcement during quiet time – except frost risk. The wall display still shows messages.",
+          "beratung_abstand": "The same message for the same room is repeated at most after this time. Any two messages are at least 10 minutes apart."
+        }
+      }
+    },
+    "error": {
+      "richtung_ohne_abstand": "Direction sensors require distance sensors."
+    }
+  },
+  "config_subentries": {
+    "raum": {
+      "entry_type": "Room",
+      "initiate_flow": {
+        "user": "Add room",
+        "reconfigure": "Edit room"
+      },
+      "step": {
+        "user": {
+          "title": "Room: devices",
+          "data": {
+            "name": "Room name",
+            "klimageraete": "Thermostats (climate entities)",
+            "temperatursensor": "External temperature sensor (optional)",
+            "feuchtesensor": "External humidity sensor (optional)",
+            "fenstersensoren": "Window/door sensors (optional)",
+            "zeitplan": "Schedule helper (optional)",
+            "zeitplan_attribut": "Temperature key in block data"
+          },
+          "description": "Which thermostats and sensors belong to the room?",
+          "data_description": {
+            "klimageraete": "Any climate entities (e.g. Zigbee, Homematic, HomeKit Device, Matter, tado). Only the heating mode (heat, else heat_cool or auto), off and the setpoint are used. Devices without off get their lowest setpoint.",
+            "zeitplan": "Inside a block the block temperature (block data, e.g. temperatur: 21) or comfort applies, outside eco. Without schedule comfort always applies.",
+            "zeitplan_attribut": "Key in the block's additional data."
+          }
+        },
+        "temperaturen": {
+          "title": "Room: temperatures",
+          "data": {
+            "komforttemperatur": "Comfort temperature (inside block)",
+            "ecotemperatur": "Eco temperature (outside blocks)",
+            "frostschutztemperatur": "Frost protection temperature",
+            "min_temperatur": "Minimum setpoint",
+            "max_temperatur": "Maximum setpoint (also boost)"
+          }
+        },
+        "verhalten": {
+          "title": "Room: behaviour",
+          "data": {
+            "overlay_modus": "Manual change in auto mode lasts",
+            "overlay_minuten": "Duration for 'for X minutes'",
+            "boost_minuten": "Boost duration",
+            "fenster_verzoegerung_offen": "Window: delay on open",
+            "fenster_verzoegerung_zu": "Window: delay on close",
+            "fenster_aktion": "When window is open",
+            "aus_mit_frostschutz": "Mode 'off' keeps frost protection",
+            "externe_aenderung_uebernehmen": "Adopt changes made directly on the thermostat",
+            "extern_aus_als_fenster": "Treat external off as window opening"
+          },
+          "data_description": {
+            "externe_aenderung_uebernehmen": "A value changed on the device is handled like a manual change. Off: it is reverted.",
+            "extern_aus_als_fenster": "For thermostats with their own window detection that switch to off (e.g. tado). On: an external off counts as an open window – 30 min frost protection, then normal operation; nothing is sent while the thermostat reports off. Off: an external off is reverted. Suggested: on for tado thermostats without window sensor."
+          }
+        },
+        "luft": {
+          "title": "Room: air (optional)",
+          "data": {
+            "co2_sensor": "CO₂ sensor (optional)",
+            "pm25_sensor": "PM2.5 sensor (optional)",
+            "nassraum": "Wet room (bathroom, shower detection)",
+            "feuchte_grenze": "Humidity limit for 'ventilation needed'",
+            "frsi": "Temperature factor fRsi of the outer wall",
+            "luftreiniger": "Air purifier (optional)",
+            "luftreiniger_filter": "Filter sensors (% or hours)",
+            "nacht_beginn": "Night from (purifier sleep)",
+            "nacht_ende": "Night until",
+            "luftreiniger_pause": "Pause after manual operation",
+            "luftreiniger_haltezeit": "Minimum hold time per level",
+            "luftreiniger_preset_auto": "Preset for level 'Auto'",
+            "luftreiniger_preset_sleep": "Preset for level 'Sleep'",
+            "luftreiniger_preset_fast": "Preset for level 'Fast'",
+            "luftreiniger_preset_turbo": "Preset for level 'Turbo'"
+          },
+          "description": "Humidity comes from the humidity sensor (step 1) or the thermostat.",
+          "data_description": {
+            "nassraum": "Humidity limit 70 % instead of 65 % by default, a quick rise is detected as a shower.",
+            "feuchte_grenze": "Empty = 65 % (wet room 70 %).",
+            "frsi": "Estimates the coldest wall spot. 0.70 = DIN 4108-2 minimum.",
+            "luftreiniger": "Controlled via presets (names per level configurable below) or, for devices without presets, via speed. Enable via the 'Purifier automation' switch (default off).",
+            "luftreiniger_filter": "Hint below 10 % or 7 days (168 h).",
+            "luftreiniger_pause": "When the purifier is operated manually, the automation pauses this long.",
+            "luftreiniger_preset_auto": "Device preset name for this level (case-insensitive). Empty = 'Auto'. Devices without presets are driven by speed (sleep 25 %, auto 50 %, fast 75 %, turbo 100 %)."
+          }
+        }
+      },
+      "error": {
+        "name_ungueltig": "Please enter a valid name.",
+        "name_vorhanden": "A room with this name already exists.",
+        "thermostat_vergeben": "The thermostat {thermostat} is already assigned to room {raum}. A thermostat may only belong to one room.",
+        "eigene_entitaet": "PM Klima entities cannot be used as thermostat.",
+        "min_max": "Minimum must be lower than maximum.",
+        "ausser_bereich": "Comfort and eco must be between minimum and maximum."
+      },
+      "abort": {
+        "reconfigure_successful": "Room updated."
+      }
+    }
+  },
+  "selector": {
+    "vorheizstufe": {
+      "options": {
+        "aus": "Off – heat on arrival",
+        "eco": "Eco – preheat late",
+        "balance": "Balance",
+        "komfort": "Comfort – preheat early",
+        "eigene": "Custom"
+      }
+    },
+    "sperre_wirkung": {
+      "options": {
+        "zeitplan": "Pause absence/preheat only (schedule runs)",
+        "aus": "Heating off in auto mode (summer)"
+      }
+    },
+    "overlay_modus": {
+      "options": {
+        "naechster_block": "Until next schedule change",
+        "timer": "For X minutes",
+        "dauerhaft": "Permanently (until auto)"
+      }
+    },
+    "fenster_aktion": {
+      "options": {
+        "frostschutz": "Frost protection",
+        "aus": "Thermostat off"
+      }
+    },
+    "kanal": {
+      "options": {
+        "push": "Push",
+        "alexa": "Voice announcement",
+        "panel": "Wall display"
+      }
+    },
+    "thema": {
+      "options": {
+        "frostgefahr": "Frost risk",
+        "heizen_fenster": "Heating with open window",
+        "schimmel": "Mould risk",
+        "fenster_schliessen": "Close window",
+        "fenster_regen": "Window open while raining",
+        "lueften_co2": "Ventilate (CO₂)",
+        "lueften_feuchte": "Ventilate (humidity)",
+        "feinstaub": "Particulate matter",
+        "zu_trocken": "Too dry",
+        "filter": "Filter maintenance"
+      }
+    },
+    "sprache": {
+      "options": {
+        "auto": "Automatic (Home Assistant language)",
+        "de": "German",
+        "en": "English"
+      }
+    }
+  },
+  "entity": {
+    "climate": {
+      "raum": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "none": "None",
+              "zeitplan": "Schedule",
+              "manuell": "Manual",
+              "komfort": "Comfort",
+              "eco": "Eco",
+              "abwesend": "Away",
+              "frostschutz": "Frost protection",
+              "boost": "Boost"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "grund": {
+        "name": "Reason",
+        "state": {
+          "zeitplan": "Schedule",
+          "abwesenheit": "Away",
+          "vorheizen": "Preheating",
+          "fenster": "Window open",
+          "fenster_extern": "Window (thermostat)",
+          "sperre": "Locked",
+          "manuell": "Manual",
+          "boost": "Boost",
+          "aus": "Off",
+          "pausiert": "Paused"
+        }
+      },
+      "abwesenheitsphase": {
+        "name": "Away phase",
+        "state": {
+          "zuhause": "Home",
+          "komfort": "Comfort (preheat)",
+          "zwischen": "Between",
+          "halten": "Hold",
+          "fern": "Far"
+        }
+      },
+      "luftqualitaet": {
+        "name": "Quality",
+        "state": {
+          "gut": "Good",
+          "mittel": "Medium",
+          "schlecht": "Poor"
+        }
+      },
+      "schimmelrisiko": {
+        "name": "Mould risk"
+      },
+      "lueftdauer": {
+        "name": "Ventilation time"
+      },
+      "klima_empfehlung": {
+        "name": "Recommendation"
+      }
+    },
+    "binary_sensor": {
+      "fenster_offen": {
+        "name": "Window open"
+      },
+      "lueften_empfohlen": {
+        "name": "Ventilation advised"
+      }
+    },
+    "switch": {
+      "aktiv": {
+        "name": "Heating active"
+      },
+      "beratung": {
+        "name": "Advice"
+      },
+      "luftreiniger_automatik": {
+        "name": "Purifier automation"
+      }
+    }
+  },
+  "issues": {
+    "extern_aus": {
+      "title": "Thermostat in {raum} is repeatedly switched off",
+      "description": "The thermostat in {raum} was switched off externally {anzahl} times within 30 minutes (on the device, in the vendor app or by the vendor cloud). PM Klima now waits {pause} minutes (or until its next own change) before reverting, to spare battery and any vendor API quota.\n\nPlease check the vendor app for geofencing/away, an own schedule or open-window detection interfering (tado: tado app). To treat an external off as a window opening in this room, enable 'Treat external off as window opening'. Switch off via {entitaet}.\n\nThis notice disappears after 60 minutes without an external off."
+    },
+    "thermostat_fehlt": {
+      "title": "Thermostat for {raum} not found",
+      "description": "Room {raum} uses a thermostat that no longer exists: {entitaeten}. If e.g. the tado integration was removed, please enter the new (local) entity – via 'Edit room' or the service pm_heizung.entitaet_ersetzen. The notice disappears after the next start without missing thermostat."
+    }
+  },
+  "exceptions": {
+    "beratung_nicht_verfuegbar": {
+      "message": "Advice is not available (integration not loaded)."
+    },
+    "nicht_geladen": {
+      "message": "PM Klima is not loaded."
+    },
+    "domain_verschieden": {
+      "message": "{alt} and {neu} have different domains."
+    },
+    "entitaet_fehlt": {
+      "message": "The entity {entitaet} does not exist."
+    },
+    "nicht_verwendet": {
+      "message": "{entitaet} is not used by PM Klima."
+    },
+    "thermostat_vergeben": {
+      "message": "{entitaet} is already assigned to room {raum}."
+    }
+  },
+  "services": {
+    "boost": {
+      "name": "Boost",
+      "description": "Heats the room at maximum temperature for the given duration.",
+      "fields": {
+        "dauer": {
+          "name": "Duration",
+          "description": "Minutes; empty = room setting."
+        }
+      }
+    },
+    "set_overlay": {
+      "name": "Set overlay",
+      "description": "Sets a manual setpoint (like turning the thermostat).",
+      "fields": {
+        "temperatur": {
+          "name": "Temperature",
+          "description": "Setpoint in °C."
+        },
+        "dauer": {
+          "name": "Duration",
+          "description": "Minutes; empty = room setting, 0 = permanent."
+        }
+      }
+    },
+    "clear_overlay": {
+      "name": "Clear overlay",
+      "description": "Ends manual overlay and boost."
+    },
+    "reevaluate": {
+      "name": "Re-evaluate",
+      "description": "Recomputes central logic and all rooms."
+    },
+    "abhaengigkeiten": {
+      "name": "Check dependencies",
+      "description": "Lists all configured entities with their integration and shows whether anything still depends on a cloud integration (e.g. tado). Response: tado_integration_entbehrlich = true once nothing needs the tado integration any more."
+    },
+    "entitaet_ersetzen": {
+      "name": "Replace entity",
+      "description": "Replaces an entity in the central settings and all rooms, e.g. the tado cloud thermostat with the local HomeKit entity. Schedules, settings and state are kept; the integration reloads afterwards.",
+      "fields": {
+        "alt": {
+          "name": "Old entity",
+          "description": "May already be deleted."
+        },
+        "neu": {
+          "name": "New entity",
+          "description": "Must have the same domain."
+        }
+      }
+    },
+    "beratung_testen": {
+      "name": "Test advice",
+      "description": "Sends a test message to one channel – without throttling, quiet time, mute switches and presence check.",
+      "fields": {
+        "kanal": {
+          "name": "Channel",
+          "description": "Push, voice announcement or wall display."
+        },
+        "thema": {
+          "name": "Topic (optional)",
+          "description": "With a topic, a sample message of that topic is sent, otherwise a test text."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie beschrieben.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Danke für die Meldung. Je genauer die Angaben, desto schneller die Lösung.
+  - type: textarea
+    id: beschreibung
+    attributes:
+      label: Was passiert – und was sollte passieren?
+    validations:
+      required: true
+  - type: input
+    id: ha
+    attributes:
+      label: Home-Assistant-Version
+      placeholder: "2026.9.3"
+    validations:
+      required: true
+  - type: input
+    id: pm
+    attributes:
+      label: PM-Klima-Version
+      placeholder: "2.1.0"
+    validations:
+      required: true
+  - type: input
+    id: thermostat
+    attributes:
+      label: Thermostat und Integration
+      placeholder: "z. B. Aqara E1 über Zigbee2MQTT, tado V3+ über HomeKit"
+  - type: textarea
+    id: diagnose
+    attributes:
+      label: Diagnosedaten / Protokoll
+      description: Gerät „<Raum> Heizung“ → Diagnosedaten herunterladen; Protokoll mit `custom_components.pm_heizung` auf debug.
+      render: text
