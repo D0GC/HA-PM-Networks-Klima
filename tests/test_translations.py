@@ -40,7 +40,8 @@ def test_services_translated() -> None:
 def test_manifest() -> None:
     """Manifest-Pflichtfelder."""
     manifest = json.loads((BASE / "manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "2.1.0"
+    changelog = (BASE.parents[1] / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert f"## {manifest['version']}" in changelog
     assert manifest["documentation"].startswith("https://github.com/D0GC/")
     assert manifest["name"] == "PM Klima"
     assert manifest["domain"] == "pm_heizung"
