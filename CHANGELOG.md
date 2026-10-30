@@ -2,6 +2,11 @@
 
 Alle nennenswerten Änderungen an PM Klima.
 
+## 2.1.1
+
+* `pm_heizung.entitaet_ersetzen` ist nur noch für Administratoren aufrufbar, da der Dienst die
+  Konfiguration der Zentrale und aller Räume ändert.
+
 ## 2.1.0 – für beliebige Thermostate und Installationen
 
 * Heiz- und Aus-Modus je Gerät aus `hvac_modes` (heat → heat_cool → auto; ohne `off` die

@@ -6,8 +6,8 @@ from typing import Any
 
 from homeassistant.components.climate import HVACMode
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, ServiceCall, State
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.core import Context, HomeAssistant, ServiceCall, State
+from homeassistant.exceptions import ServiceValidationError, Unauthorized
 from homeassistant.helpers import (
     device_registry as dr,
     entity_registry as er,
@@ -375,6 +375,24 @@ async def test_replace_entity_service(
     assert sub.data["klimageraete"] == ["climate.wohnzimmer_homekit"]
     assert sub.data["komforttemperatur"] == 21.0
     assert entry.state is ConfigEntryState.LOADED
+
+
+async def test_replace_entity_admin_only(
+    hass: HomeAssistant, backend: FakeThermostat, freezer, hass_read_only_user
+) -> None:
+    """entitaet_ersetzen ändert die Konfiguration und ist Administratoren vorbehalten."""
+    await setup_v4(hass)
+    await settle(hass, freezer)
+    hass.states.async_set("climate.wohnzimmer_homekit", "off", {"hvac_modes": ["off", "heat"]})
+
+    with pytest.raises(Unauthorized):
+        await hass.services.async_call(
+            DOMAIN,
+            "entitaet_ersetzen",
+            {"alt": BACKEND, "neu": "climate.wohnzimmer_homekit"},
+            blocking=True,
+            context=Context(user_id=hass_read_only_user.id),
+        )
 
 
 async def test_missing_thermostat_issue(

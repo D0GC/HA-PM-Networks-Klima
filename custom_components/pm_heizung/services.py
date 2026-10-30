@@ -216,7 +216,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             hass, _loaded_entry(hass), call.data[ATTR_OLD], call.data[ATTR_NEW]
         )
 
-    hass.services.async_register(
+    service.async_register_admin_service(
+        hass,
         DOMAIN,
         SERVICE_REPLACE_ENTITY,
         _replace_entity,
