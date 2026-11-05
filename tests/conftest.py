@@ -13,7 +13,7 @@ from homeassistant.components.climate import (
     ClimateEntityFeature,
     HVACMode,
 )
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import MAJOR_VERSION, MINOR_VERSION, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.setup import async_setup_component
@@ -28,12 +28,14 @@ from custom_components.pm_heizung.const import DOMAIN, SUBENTRY_ROOM
 
 BACKEND = "climate.tado_wohnzimmer"
 
+# Ab HA 2026.11 heißen die Temperatur-Attribute der Climate-Entität native_*
+_NATIVE_CLIMATE = (MAJOR_VERSION, MINOR_VERSION) >= (2026, 11)
+
 
 class FakeThermostat(ClimateEntity):
     """Simuliert ein Thermostat (HomeKit/tado): heat/off/auto + Solltemperatur."""
 
     _attr_should_poll = False
-    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.AUTO, HVACMode.HEAT]  # noqa: RUF012
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE
@@ -41,6 +43,10 @@ class FakeThermostat(ClimateEntity):
         | ClimateEntityFeature.TURN_OFF
     )
     _attr_min_temp = 5
+    if _NATIVE_CLIMATE:
+        _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
+    else:
+        _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 25
     _attr_target_temperature_step = 0.5
 
@@ -50,7 +56,10 @@ class FakeThermostat(ClimateEntity):
         self._attr_name = name
         self._attr_hvac_mode = HVACMode.AUTO
         self._attr_target_temperature = 20.0
-        self._attr_native_current_temperature = 20.5
+        if _NATIVE_CLIMATE:
+            self._attr_native_current_temperature = 20.5
+        else:
+            self._attr_current_temperature = 20.5
         self._attr_current_humidity = 55.0
         self.calls: list[tuple[str, Any]] = []
         self.fail = False  # Dienstaufruf wirft Fehler

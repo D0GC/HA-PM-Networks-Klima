@@ -8,8 +8,9 @@ Alle nennenswerten Änderungen an PM Klima.
   `native_current_temperature` und `native_target_temperature` statt der ab HA 2027.11
   entfallenden Namen `temperature_unit`, `current_temperature` und `target_temperature`.
   Das Verhalten bleibt unverändert (Einheit °C, Schrittweite 0,5, Thermostatverhalten).
-* Mindestversion Home Assistant auf 2026.11.0 angehoben, da die `native_*`-Namen erst ab dieser
-  Version existieren.
+* Kompatibilität: Unter Home Assistant 2026.11 und neuer werden ausschließlich die `native_*`-Namen
+  definiert (keine Deprecation-Warnung); unter älteren Versionen (ab 2026.2.0) delegieren die alten
+  Namen an dieselben Werte. Die Mindestversion bleibt 2026.2.0.
 
 ## 2.1.1
 
