@@ -1,3 +1,5 @@
-# Testumgebung: Home Assistant 2026.2.3 (letzte Version für Python 3.13)
-pytest-homeassistant-custom-component==0.13.316
+# Testumgebung: pytest-homeassistant-custom-component 0.13.375 (Python 3.14).
+# Die Home-Assistant-Version 2026.11.0 wird in den Workflows darüber installiert
+# (vorübergehender Override, entfernen sobald phcc eine 2026.11.x-Version hat).
+pytest-homeassistant-custom-component==0.13.375
 ruff==0.16.9

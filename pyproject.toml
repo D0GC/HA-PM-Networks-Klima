@@ -1,5 +1,5 @@
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 line-length = 100
 # wörtlicher Auszug aus HA 2026.9.3 (Annotationen bewusst unaufgelöst)
 extend-exclude = ["tests/fixtures/ha_2026_9_3_device_registry.py", "tools/screenshots"]
@@ -19,6 +19,6 @@ testpaths = ["tests"]
 markers = ["allow_errors: Test erzeugt absichtlich Fehlermeldungen"]
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.14"
 ignore_missing_imports = true
 check_untyped_defs = true
