@@ -73,7 +73,7 @@ def distance_to_m(state: str | None, unit: str | None) -> float:
     """Abstand in Meter; unbekannt = sehr weit weg."""
     try:
         value = float(state)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return FAR_AWAY_M
     if math.isnan(value):
         return FAR_AWAY_M

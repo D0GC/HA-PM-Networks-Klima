@@ -116,7 +116,7 @@ RAIN_WINDOW_MIN = 2.0
 def _float(value: Any) -> float | None:
     try:
         return float(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return None
 
 

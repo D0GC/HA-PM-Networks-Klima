@@ -35,7 +35,7 @@ def supports_via_device_id(device_info_cls: Any, get_or_create: Any) -> bool:
         func = getattr(get_or_create, "__wrapped__", get_or_create)
         code = func.__code__
         params = code.co_varnames[: code.co_argcount + code.co_kwonlyargcount]
-    except (AttributeError, TypeError):
+    except AttributeError, TypeError:
         return False
     return "via_device_id" in keys and "via_device_id" in params
 

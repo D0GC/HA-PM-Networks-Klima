@@ -179,7 +179,7 @@ class Central:
         st = self.hass.states.get(outdoor)
         try:
             return float(st.state) if st else None
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             return None
 
     def tracked_entities(self) -> list[str]:
@@ -331,7 +331,7 @@ class Central:
             st = self.hass.states.get(outdoor)
             try:
                 value = float(st.state) if st else None
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 value = None  # unbekannter Wert sperrt nicht
             limit = float(self.opt(CONF_OUTDOOR_LIMIT, DEFAULT_OUTDOOR_LIMIT))
             if value is not None and value >= limit:  # keine Hysterese
