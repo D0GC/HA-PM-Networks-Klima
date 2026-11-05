@@ -1,8 +1,9 @@
 <p align="center">
-  <img src="docs/bilder/banner.png" alt="PM Klima – Heizung, Luft &amp; Beratung für Home Assistant" width="100%">
+  <a href="https://pm-networks.com/produkte/pm-klima/"><img src="docs/bilder/banner.png" alt="PM Klima – Heizung, Luft &amp; Beratung für Home Assistant" width="100%"></a>
 </p>
 
 <p align="center">
+  <a href="https://pm-networks.com"><img src="https://img.shields.io/badge/Website-pm--networks.com-784295.svg?style=flat" alt="Website pm-networks.com"></a>
   <a href="https://hacs.xyz"><img src="https://img.shields.io/badge/HACS-Integration-41BDF5.svg" alt="HACS Integration"></a>
   <img src="https://img.shields.io/badge/Home%20Assistant-2026.2%2B-18BCF2.svg" alt="Home Assistant 2026.2+">
   <img src="https://img.shields.io/badge/Version-2.1.2-784295.svg" alt="Version 2.1.2">
@@ -22,6 +23,8 @@ Thermostat.** Zeitpläne mit Blocktemperaturen, manuelle Overlays, Abwesenheit u
 Geofencing, Fenstererkennung, Boost und Sommerbetrieb. Dazu ein Luftmodul mit Schimmelrisiko und
 Lüftempfehlung sowie eine Beratung, die sich zurückhaltend per Push, Sprachansage oder Wanddisplay
 meldet.
+
+> **Produktseite, Neuigkeiten und Kontakt:** [pm-networks.com/produkte/pm-klima](https://pm-networks.com/produkte/pm-klima/)
 
 ![Beispiel-Dashboard](docs/bilder/dashboard.png)
 
@@ -98,3 +101,5 @@ the screenshots and YAML examples are language-independent.
 
 <sub>PM Klima ist ein Projekt von PM Networks und steht in keiner Verbindung zu tado GmbH oder zu
 anderen Herstellern. Alle Screenshots stammen aus einer Demo-Instanz mit Beispieldaten.</sub>
+
+<p align="center"><a href="https://pm-networks.com"><b>pm-networks.com</b></a> · <sub>© 2026 PM Networks</sub></p>
