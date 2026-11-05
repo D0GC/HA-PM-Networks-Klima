@@ -2,6 +2,15 @@
 
 Alle nennenswerten Änderungen an PM Klima.
 
+## 2.1.2
+
+* Anpassung an Home Assistant 2026.11: Die Climate-Entität nutzt `native_temperature_unit`,
+  `native_current_temperature` und `native_target_temperature` statt der ab HA 2027.11
+  entfallenden Namen `temperature_unit`, `current_temperature` und `target_temperature`.
+  Das Verhalten bleibt unverändert (Einheit °C, Schrittweite 0,5, Thermostatverhalten).
+* Mindestversion Home Assistant auf 2026.11.0 angehoben, da die `native_*`-Namen erst ab dieser
+  Version existieren.
+
 ## 2.1.1
 
 * `pm_heizung.entitaet_ersetzen` ist nur noch für Administratoren aufrufbar, da der Dienst die

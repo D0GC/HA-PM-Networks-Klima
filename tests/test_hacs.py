@@ -44,5 +44,5 @@ def test_hacs_json() -> None:
     """hacs.json nennt Name und Mindestversion von Home Assistant."""
     data = json.loads((ROOT / "hacs.json").read_text(encoding="utf-8"))
     assert data["name"] == "PM Klima"
-    assert data["homeassistant"] == "2026.2.0"
+    assert data["homeassistant"] == "2026.11.0"
     assert data["render_readme"] is True

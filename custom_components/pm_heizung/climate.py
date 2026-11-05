@@ -40,7 +40,7 @@ class PmHeizungClimate(RoomEntity, ClimateEntity, RestoreEntity):
 
     _attr_name = None
     _attr_translation_key = "raum"
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_target_temperature_step = 0.5
     _attr_hvac_modes = [HVACMode.AUTO, HVACMode.HEAT, HVACMode.OFF]  # noqa: RUF012
     _attr_preset_modes = list(PRESETS)  # noqa: RUF012
@@ -92,12 +92,12 @@ class PmHeizungClimate(RoomEntity, ClimateEntity, RestoreEntity):
         return self.room.hvac_action()
 
     @property
-    def target_temperature(self) -> float | None:
+    def native_target_temperature(self) -> float | None:
         d = self.room.desired
         return d.target if d else None
 
     @property
-    def current_temperature(self) -> float | None:
+    def native_current_temperature(self) -> float | None:
         return self.room.current_temperature()
 
     @property

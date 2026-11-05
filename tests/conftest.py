@@ -33,7 +33,7 @@ class FakeThermostat(ClimateEntity):
     """Simuliert ein Thermostat (HomeKit/tado): heat/off/auto + Solltemperatur."""
 
     _attr_should_poll = False
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.AUTO, HVACMode.HEAT]  # noqa: RUF012
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE
@@ -50,7 +50,7 @@ class FakeThermostat(ClimateEntity):
         self._attr_name = name
         self._attr_hvac_mode = HVACMode.AUTO
         self._attr_target_temperature = 20.0
-        self._attr_current_temperature = 20.5
+        self._attr_native_current_temperature = 20.5
         self._attr_current_humidity = 55.0
         self.calls: list[tuple[str, Any]] = []
         self.fail = False  # Dienstaufruf wirft Fehler
