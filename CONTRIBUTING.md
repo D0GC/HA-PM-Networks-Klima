@@ -13,7 +13,7 @@ betroffenen Raumgeräts (Gerät → „Diagnosedaten herunterladen“) und einen
 ## Entwicklung
 
 ```bash
-python3.13 -m venv .venv && source .venv/bin/activate
+python3.14 -m venv .venv && source .venv/bin/activate
 pip install -r requirements_test.txt
 ruff check . && ruff format --check .
 python -m pytest -q

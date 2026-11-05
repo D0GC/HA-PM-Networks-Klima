@@ -158,7 +158,7 @@ Ankunft läuft immer, auch während der Sperre.
   so gut wie die Sensoren; Regen wird über den Zustand der Wetter-Entität erkannt.
 * Beratung: „anwesend“ je Person = Personen-Zustand `home`; die Zeitbedingungen werden minütlich
   geprüft.
-* Getestet mit pytest gegen Home Assistant 2026.2.3 (letzte Version für Python 3.13).
+* Getestet mit pytest gegen Home Assistant 2026.11.0 (Python 3.14).
   `via_device_id` (ab 2026.8) wird automatisch genutzt, ältere Versionen erhalten `via_device`.
 
 ---
