@@ -11,7 +11,7 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
+from homeassistant.const import ATTR_TEMPERATURE, MAJOR_VERSION, MINOR_VERSION, UnitOfTemperature
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.restore_state import ExtraStoredData, RestoredExtraData, RestoreEntity
@@ -23,6 +23,10 @@ from .entity import RoomEntity
 from .room import RoomController
 
 PARALLEL_UPDATES = 0
+
+# Ab Home Assistant 2026.11 heißen die Temperatur-Eigenschaften native_*; ältere Versionen
+# kennen nur die alten Namen (temperature_unit, current_temperature, target_temperature).
+_NATIVE_CLIMATE = (MAJOR_VERSION, MINOR_VERSION) >= (2026, 11)
 
 
 async def async_setup_entry(
@@ -99,6 +103,18 @@ class PmHeizungClimate(RoomEntity, ClimateEntity, RestoreEntity):
     @property
     def native_current_temperature(self) -> float | None:
         return self.room.current_temperature()
+
+    if not _NATIVE_CLIMATE:
+        # Kompatibilität für Home Assistant < 2026.11: alte Namen delegieren an native_*.
+        _attr_temperature_unit = UnitOfTemperature.CELSIUS
+
+        @property
+        def target_temperature(self) -> float | None:
+            return self.native_target_temperature
+
+        @property
+        def current_temperature(self) -> float | None:
+            return self.native_current_temperature
 
     @property
     def current_humidity(self) -> float | None:

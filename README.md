@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://hacs.xyz"><img src="https://img.shields.io/badge/HACS-Integration-41BDF5.svg" alt="HACS Integration"></a>
-  <img src="https://img.shields.io/badge/Home%20Assistant-2026.11%2B-18BCF2.svg" alt="Home Assistant 2026.11+">
+  <img src="https://img.shields.io/badge/Home%20Assistant-2026.2%2B-18BCF2.svg" alt="Home Assistant 2026.2+">
   <img src="https://img.shields.io/badge/Version-2.1.2-784295.svg" alt="Version 2.1.2">
   <a href="https://github.com/D0GC/HA-PM-Networks-Klima/actions/workflows/ci.yml"><img src="https://github.com/D0GC/HA-PM-Networks-Klima/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/Sprache-Deutsch%20%7C%20English-443171.svg" alt="Deutsch | English">

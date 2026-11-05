@@ -6,7 +6,7 @@
 
 | Punkt | Anforderung |
 |---|---|
-| Home Assistant | 2026.11 oder neuer (API-Abgleich mit Core 2026.11.0; Tests lokal nur gegen 2026.2.3 lauffähig, siehe unten) |
+| Home Assistant | 2026.2 oder neuer (unter 2026.11 und neuer werden die `native_*`-Namen der Climate-Entität genutzt) |
 | Thermostate | beliebige `climate`-Entitäten mit Solltemperatur – siehe [Thermostate](thermostate.md) |
 | Personen | mindestens eine `person`-Entität (für Abwesenheit und Vorheizen) |
 | optional | Proximity-Integration, Fenster-/Türsensoren, Zeitplan-Helfer, Feuchte-/CO₂-/PM2,5-Sensoren, Luftreiniger (`fan`), Wetter-Entität |
